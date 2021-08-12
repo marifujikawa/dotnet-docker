@@ -11,6 +11,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using Microsoft.EntityFrameworkCore;
+using teste.Models;
+/* using teste.Models; */
 
 namespace teste
 {
@@ -27,10 +30,17 @@ namespace teste
         public void ConfigureServices(IServiceCollection services)
         {
 
+
             services.AddControllers();
+            services.AddDbContext<testeContext>(options =>
+                options.UseNpgsql(Configuration["ConnectionStrings:Default"]));
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebApp1", Version = "v1" });
+            });
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
             });
         }
 
@@ -48,7 +58,7 @@ namespace teste
             /* app.UseHttpsRedirection(); */
 
             app.UseRouting();
-
+            app.UseCors();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

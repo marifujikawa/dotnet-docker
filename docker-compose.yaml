@@ -2,11 +2,34 @@ version: "3.4"
 
 services:
   teste:
+    depends_on:
+      - db
     image: teste
     build:
       context: .
     ports:
-      - "80:80"
+      - "5000:5000"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:80
+      - ASPNETCORE_URLS=http://+:5000
+    networks:
+      - postgres-network
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: teste
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: teste
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres-network
+
+volumes:
+  db:
+    driver: local
+
+networks:
+  postgres-network:
+    driver: bridge

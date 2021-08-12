@@ -17,4 +17,5 @@ FROM mcr.microsoft.com/dotnet/aspnet:5.0
 WORKDIR /app
 COPY --from=build-env /app/out .
 #ENV ASPNETCORE_URLS http://+:5000;https://+:5001
+#RUN dotnet ef dbcontext scaffold "Server=localhost;Port=5432;Database=teste;User Id=teste;Password=root;" Npgsql.EntityFrameworkCore.PostgreSQL -o Models
 ENTRYPOINT ["dotnet", "teste.dll"]
