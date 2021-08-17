@@ -9,7 +9,7 @@ using teste.Models;
 namespace teste.Migrations
 {
     [DbContext(typeof(testeContext))]
-    [Migration("20210812203204_InitialCreate")]
+    [Migration("20210817180705_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

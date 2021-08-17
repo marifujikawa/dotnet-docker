@@ -17,6 +17,8 @@ services:
   db:
     image: postgres
     restart: always
+    volumes: 
+      - db:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: teste
       POSTGRES_PASSWORD: root
