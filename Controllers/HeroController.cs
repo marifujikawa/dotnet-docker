@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using teste.Models;
+using teste.ViewModel;
 
 namespace teste.Controllers
 {
@@ -75,13 +76,25 @@ namespace teste.Controllers
         // POST: api/Hero
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Hero>> PostHero(Hero hero)
+        public async Task<ActionResult<Hero>> PostHero(HeroPowersViewModel heroViewModel)
         {
+            Hero hero = heroViewModel.Hero;
+            List<Power> powers = heroViewModel.Powers;
+            foreach (Power power in powers)
+            {
+                hero.HeroPowers.Add(new HeroPower()
+                {
+                    HeroId = hero.Id,
+                    PowerId = power.Id,
+                });
+            }
             _context.Heroes.Add(hero);
+
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetHero", new { id = hero.Id }, hero);
         }
+
 
         // DELETE: api/Hero/5
         [HttpDelete("{id}")]
