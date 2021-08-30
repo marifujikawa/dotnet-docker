@@ -23,7 +23,10 @@ namespace teste.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-           
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseNpgsql("Name=ConnectionStrings:Default");
+            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -46,6 +49,10 @@ namespace teste.Models
             modelBuilder.Entity<HeroPower>(entity =>
             {
                 entity.ToTable("hero_power");
+
+                entity.HasIndex(e => e.HeroId, "IX_hero_power_hero_id");
+
+                entity.HasIndex(e => e.PowerId, "IX_hero_power_power_id");
 
                 entity.Property(e => e.Id)
                     .HasColumnName("id")

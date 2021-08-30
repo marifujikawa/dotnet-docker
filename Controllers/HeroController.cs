@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using teste.Models;
@@ -76,23 +74,34 @@ namespace teste.Controllers
         // POST: api/Hero
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Hero>> PostHero(HeroPowersViewModel heroViewModel)
+        public async Task<ActionResult<HeroPowersViewModel>> PostHero(HeroPowersViewModel heroViewModel)
         {
-            Hero hero = heroViewModel.Hero;
-            List<Power> powers = heroViewModel.Powers;
-            foreach (Power power in powers)
+            Hero hero = new Hero()
             {
-                hero.HeroPowers.Add(new HeroPower()
-                {
-                    HeroId = hero.Id,
-                    PowerId = power.Id,
-                });
-            }
+                Name = heroViewModel.Name
+            };
+            List<Power> powers = heroViewModel.Powers;
+
+            List<HeroPower> heroPowers = new List<HeroPower>();
             _context.Heroes.Add(hero);
-
             await _context.SaveChangesAsync();
+            if (powers != null)
+            {
 
-            return CreatedAtAction("GetHero", new { id = hero.Id }, hero);
+
+                foreach (Power power in powers)
+                {
+                    heroPowers.Add(new HeroPower()
+                    {
+                        HeroId = hero.Id,
+                        PowerId = power.Id
+                    });
+                }
+                _context.AddRange(heroPowers);
+                await _context.SaveChangesAsync();
+
+            }
+            return heroViewModel;
         }
 
 
