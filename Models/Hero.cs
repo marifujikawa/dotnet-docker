@@ -1,20 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using Newtonsoft.Json;
 
 #nullable disable
 
 namespace teste.Models
 {
-    public partial class Hero
+    public class Hero
     {
-        public Hero()
-        {
-            HeroPowers = new HashSet<HeroPower>();
-        }
-
+        [JsonProperty("id")]
         public int Id { get; set; }
+
+        [JsonProperty("name")]
         public string Name { get; set; }
 
-        public virtual ICollection<HeroPower> HeroPowers { get; set; }
+        [JsonProperty("powers")]
+        public ICollection<Power> Powers { get; set; }
     }
 }

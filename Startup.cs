@@ -30,7 +30,9 @@ namespace teste
         {
 
 
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson(options =>
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+            );
             services.AddDbContext<testeContext>(options =>
                 options.UseNpgsql(Configuration["ConnectionStrings:Default"]));
             services.AddSwaggerGen(c =>

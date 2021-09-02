@@ -2,6 +2,7 @@ version: "3.4"
 
 services:
   teste:
+    container_name: "teste"
     depends_on:
       - db
     image: teste
@@ -15,9 +16,10 @@ services:
     networks:
       - postgres-network
   db:
+    container_name: "db"
     image: postgres
     restart: always
-    volumes: 
+    volumes:
       - db:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: teste

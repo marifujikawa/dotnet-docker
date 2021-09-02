@@ -30,7 +30,7 @@ namespace teste.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Hero>> GetHero(int id)
         {
-            var hero = await _context.Heroes.FindAsync(id);
+            var hero = await _context.Heroes.Where(b => b.Id == id).FirstOrDefaultAsync();
 
             if (hero == null)
             {
@@ -76,33 +76,49 @@ namespace teste.Controllers
         [HttpPost]
         public async Task<ActionResult<HeroPowersViewModel>> PostHero(HeroPowersViewModel heroViewModel)
         {
-            Hero hero = new Hero()
-            {
-                Name = heroViewModel.Name
-            };
-            List<Power> powers = heroViewModel.Powers;
+            ICollection<Power> powers = heroViewModel.Powers;
+            Hero hero = heroViewModel.Hero;
 
-            List<HeroPower> heroPowers = new List<HeroPower>();
             _context.Heroes.Add(hero);
             await _context.SaveChangesAsync();
-            if (powers != null)
-            {
+            await SaveHeroPowersAsync(hero, powers);
+            heroViewModel.Hero = hero;
 
-
-                foreach (Power power in powers)
-                {
-                    heroPowers.Add(new HeroPower()
-                    {
-                        HeroId = hero.Id,
-                        PowerId = power.Id
-                    });
-                }
-                _context.AddRange(heroPowers);
-                await _context.SaveChangesAsync();
-
-            }
             return heroViewModel;
         }
+
+        private async Task SaveHeroPowersAsync(Hero hero, ICollection<Power> powers)
+        {
+            var heroPowers = new List<HeroPowers>();
+            foreach (var power in powers)
+            {
+                var powerId = power.Id;
+                if (power.Id == 0)
+                {
+                    var newPower = await SaveNewPowerAsync(power);
+                    powerId = newPower.Id;
+
+                }
+
+                heroPowers.Add(new HeroPowers()
+                {
+                    HeroId = hero.Id,
+                    PowerId = powerId
+                });
+            }
+
+            _context.AddRange(heroPowers);
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task<Power> SaveNewPowerAsync(Power power)
+        {
+            _context.Powers.Add(power);
+            await _context.SaveChangesAsync();
+            return power;
+        }
+
+
 
 
         // DELETE: api/Hero/5

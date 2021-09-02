@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using System.Linq;
 
 #nullable disable
 
@@ -18,8 +19,8 @@ namespace teste.Models
         }
 
         public virtual DbSet<Hero> Heroes { get; set; }
-        public virtual DbSet<HeroPower> HeroPowers { get; set; }
         public virtual DbSet<Power> Powers { get; set; }
+        public virtual DbSet<HeroPowers> HeroPowers { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -29,67 +30,32 @@ namespace teste.Models
             }
         }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder builder)
         {
-            modelBuilder.HasAnnotation("Relational:Collation", "en_US.utf8");
 
-            modelBuilder.Entity<Hero>(entity =>
+            base.OnModelCreating(builder);
+
+            builder.Entity<HeroPowers>(e =>
             {
-                entity.ToTable("hero");
-
-                entity.Property(e => e.Id)
-                    .HasColumnName("id")
-                    .UseIdentityAlwaysColumn();
-
-                entity.Property(e => e.Name)
-                    .IsRequired()
-                    .HasColumnType("character varying");
+                e.HasKey(i => new { i.HeroId, i.PowerId });
+                e.ToTable("HeroPower");
             });
-
-            modelBuilder.Entity<HeroPower>(entity =>
-            {
-                entity.ToTable("hero_power");
-
-                entity.HasIndex(e => e.HeroId, "IX_hero_power_hero_id");
-
-                entity.HasIndex(e => e.PowerId, "IX_hero_power_power_id");
-
-                entity.Property(e => e.Id)
-                    .HasColumnName("id")
-                    .UseIdentityAlwaysColumn();
-
-                entity.Property(e => e.HeroId).HasColumnName("hero_id");
-
-                entity.Property(e => e.PowerId).HasColumnName("power_id");
-
-                entity.HasOne(d => d.Hero)
-                    .WithMany(p => p.HeroPowers)
-                    .HasForeignKey(d => d.HeroId)
-                    .HasConstraintName("hero_power_fk");
-
-                entity.HasOne(d => d.Power)
-                    .WithMany(p => p.HeroPowers)
-                    .HasForeignKey(d => d.PowerId)
-                    .HasConstraintName("hero_power_fk_1");
-            });
-
-            modelBuilder.Entity<Power>(entity =>
-            {
-                entity.ToTable("power");
-
-                entity.Property(e => e.Id)
-                    .HasColumnName("id")
-                    .UseIdentityAlwaysColumn();
-
-                entity.Property(e => e.Name)
-                    .IsRequired()
-                    .HasColumnType("character varying")
-                    .HasColumnName("name");
-            });
-
-            OnModelCreatingPartial(modelBuilder);
+            builder.Entity<Hero>()
+                 .HasMany(s => s.Powers)
+                 .WithMany(c => c.Heroes)
+                 .UsingEntity<HeroPowers>(
+                    pt => pt
+                    .HasOne(p => p.Hero)
+                    .WithMany()
+                    .HasForeignKey("HeroId"),
+                pt => pt
+                    .HasOne(p => p.Power)
+                    .WithMany()
+                    .HasForeignKey("PowerId"))
+                .ToTable("HeroPower")
+                .HasKey(pt => new { pt.HeroId, pt.PowerId });
         }
-
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+
     }
 }

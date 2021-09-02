@@ -9,9 +9,8 @@ namespace teste.ViewModel
 {
     public class HeroPowersViewModel
     {
-
-        [JsonProperty("name")]
-        public String Name { get; set; }
+        [JsonProperty("hero")]
+        public Hero Hero { get; set; }
 
         [JsonProperty("powers")]
         public List<Power> Powers { get; set; }
